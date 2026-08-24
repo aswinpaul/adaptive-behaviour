@@ -1,0 +1,22 @@
+\begin{table}[ht]
+\centering
+\small
+\caption{Normalised total entropy against the analytic maximum, by time window. NTE is one when the parameter is uniform and approaches zero as it becomes fully determined, so values are comparable across agents and parameters.}
+\label{tab:nte}
+\begin{tabular}{lllrrrr}
+\toprule
+Agent & Parameter & $\mathrm{TE}_{\max}$ & NTE 0--5 & NTE 6--20 & $\Delta$ & Fall (\% of max) \\
+\midrule
+CFL-1 & $\mathbb{CL}$ & 2671.83 & 0.9987 & 0.9956 & -0.0031 & 1.2 \\
+CFL-2 & $\mathbb{CL}$ & 2671.83 & 0.9976 & 0.9922 & -0.0054 & 2.0 \\
+CFL-3 & $\mathbb{CL}$ & 2671.83 & 0.9960 & 0.9884 & -0.0076 & 2.9 \\
+CFL-4 & $\mathbb{CL}$ & 2671.83 & 0.9936 & 0.9814 & -0.0122 & 4.3 \\
+AIF-1 & $\mathbb{B}$ (ball-x) & 414.68 & 0.4148 & 0.3616 & -0.0532 & 83.8 \\
+DP-2 & $\mathbb{B}$ (ball-x) & 414.68 & 0.2758 & 0.2177 & -0.0580 & 71.3 \\
+DP-5 & $\mathbb{B}$ (ball-x) & 414.68 & 0.3566 & 0.3159 & -0.0407 & 68.3 \\
+DP-10 & $\mathbb{B}$ (ball-x) & 414.68 & 0.3584 & 0.3239 & -0.0345 & 68.0 \\
+DP-20 & $\mathbb{B}$ (ball-x) & 414.68 & 0.3570 & 0.3187 & -0.0383 & 68.0 \\
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize{The final column is the fall from the highest to the lowest value attained over a trial, expressed as a percentage of the analytic maximum. The planning schemes move their transition parameters by an order of magnitude more than the counterfactual scheme moves its mapping, and the size of that movement does not order the agents by performance.}
+\end{table}

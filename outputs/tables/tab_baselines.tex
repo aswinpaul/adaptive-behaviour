@@ -1,0 +1,28 @@
+\begin{table}[ht]
+\centering
+\small
+\caption{Non-active-inference baselines beside the published agents and the cultures. Absolute rally length is the second-window mean; the change across the trial is the paired within-session difference. Intervals are replicate-level bootstraps.}
+\label{tab:baselines}
+\begin{tabular}{lllll}
+\toprule
+Class & Group & Rally length (6--20 min) & Change across trial & $p_{\mathrm{adj}}$ \\
+\midrule
+In vitro & MCC & 0.85 [0.81, 0.91] & +0.15 [0.08, 0.29] & $<$0.001 \\
+In vitro & HCC & 0.88 [0.82, 0.95] & +0.24 [0.12, 0.36] & $<$0.001 \\
+Active inference & AIF-1 & 0.80 [0.77, 0.84] & -0.02 [-0.09, 0.06] & 0.682 \\
+Active inference & CFL-1 & 1.02 [0.90, 1.18] & +0.15 [0.00, 0.32] & 0.093 \\
+Active inference & CFL-2 & 1.01 [0.92, 1.11] & +0.18 [0.07, 0.29] & 0.005 \\
+Active inference & CFL-3 & 1.44 [1.26, 1.64] & +0.45 [0.26, 0.65] & $<$0.001 \\
+Active inference & CFL-4 & 2.47 [1.80, 3.59] & +1.16 [0.64, 1.93] & 0.002 \\
+Active inference & DP-2 & 0.96 [0.86, 1.07] & +0.11 [-0.03, 0.25] & 0.175 \\
+Active inference & DP-5 & 1.19 [1.06, 1.33] & +0.30 [0.16, 0.46] & $<$0.001 \\
+Active inference & DP-10 & 1.18 [1.05, 1.32] & +0.35 [0.21, 0.51] & $<$0.001 \\
+Active inference & DP-20 & 0.98 [0.89, 1.08] & +0.14 [0.03, 0.27] & 0.030 \\
+Baseline & Random & 0.80 [0.77, 0.83] & +0.02 [-0.04, 0.08] & 0.640 \\
+Baseline & Heuristic & 12.07 [11.28, 12.89] & +1.67 [-0.13, 3.34] & 0.087 \\
+Baseline & DynaQ & 1.17 [1.10, 1.24] & +0.28 [0.20, 0.37] & $<$0.001 \\
+Baseline & DynaQ-replay & 1.04 [1.00, 1.09] & +0.17 [0.09, 0.24] & $<$0.001 \\
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize{The random controller cannot learn, and its change across the trial is accordingly indistinguishable from zero, which calibrates the improvement metric. The reactive heuristic does not learn either, but is well matched to the task.}
+\end{table}

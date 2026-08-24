@@ -1,0 +1,20 @@
+\begin{table}[ht]
+\centering
+\small
+\caption{Hyperparameters of the three decision-making schemes, read directly from the simulation code. All settings that the schemes share are identical; the quantities that differ are the ones that define the schemes, together with the prior specification of AIF-1.}
+\label{tab:hyperparams}
+\begin{tabular}{lllll}
+\toprule
+Setting & CFL-$T$ & DP-$T$ & AIF-1 & Status \\
+\midrule
+Episodes per trial & 70 & 70 & 70 & shared \\
+Action precision & 1024 & 1024 & 1024 & shared \\
+Transition learning rate & $10^{16}$ & $10^{16}$ & $10^{16}$ & shared \\
+Numerical floor & $10^{-16}$ & $10^{-16}$ & $10^{-16}$ & shared \\
+Prior preferences $\mathbb{C}$ & uniform & uniform & random categorical & differs \\
+Initial state prior $\mathbb{D}$ & uniform & uniform & random categorical & differs \\
+Horizon & memory, $T \in \{1,2,3,4\}$ & planning, $T \in \{2,5,10,20\}$ & planning, $T = 1$ & differs \\
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize{The horizon is the quantity under study and differs by construction. The prior specification of AIF-1 is the one unintended asymmetry; its effect is measured in Sec.~\ref{sec:priorcheck} and found not to account for the performance of that agent.}
+\end{table}

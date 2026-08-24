@@ -1,0 +1,22 @@
+\begin{table}[ht]
+\centering
+\small
+\caption{Across-seed association between the change in parameter entropy over a trial and the change in average rally length. A negative coefficient would indicate that seeds whose parameters became more informed improved more.}
+\label{tab:ntepredict}
+\begin{tabular}{lrrrrr}
+\toprule
+Agent & Seeds & Pearson $r$ & $p_{\mathrm{adj}}$ & Spearman $\rho$ & $p_{\mathrm{adj}}$ \\
+\midrule
+CFL-1 & 100 & -0.205 & 0.238 & -0.122 & 0.941 \\
+CFL-2 & 100 & -0.168 & 0.284 & -0.008 & 0.941 \\
+CFL-3 & 100 & -0.054 & 0.671 & +0.024 & 0.941 \\
+CFL-4 & 100 & -0.119 & 0.534 & +0.040 & 0.941 \\
+AIF-1 & 99 & +0.062 & 0.671 & +0.028 & 0.941 \\
+DP-2 & 99 & +0.070 & 0.671 & +0.015 & 0.941 \\
+DP-5 & 99 & +0.042 & 0.681 & +0.021 & 0.941 \\
+DP-10 & 99 & +0.195 & 0.238 & +0.203 & 0.395 \\
+DP-20 & 99 & -0.097 & 0.610 & -0.094 & 0.941 \\
+\bottomrule
+\end{tabular}
+\\[4pt]\footnotesize{No association survives correction for either coefficient. Parameter entropy change therefore does not predict behavioural improvement within any agent.}
+\end{table}

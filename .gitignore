@@ -1,0 +1,38 @@
+# --- environment -------------------------------------------------------------
+.venv/
+__pycache__/
+*.py[cod]
+.matplotlib-cache/
+.ipynb_checkpoints/
+
+# --- macOS ---------------------------------------------------------------------
+.DS_Store
+.Rhistory
+
+# --- private data --------------------------------------------------------------
+# In-vitro culture recordings, which are not redistributable. Several analyses
+# cannot be run without them; REPRODUCE.md lists exactly which.
+data/private/
+
+# --- runtime artefacts ---------------------------------------------------------
+# The Pong environment opens test.out when it is constructed and rewrites it on
+# every run. It reached 2.6 GB during the revision and nothing ever reads it.
+test.out
+
+# SLURM job output (see adaptive_behaviour/pong/hpc/*.sh)
+*.out
+
+# --- raw per-seed simulation output --------------------------------------------
+# Roughly 2,400 files that would dominate every diff and clone. Each directory is
+# regenerable by re-running its runner over the seeds listed in the matching
+# .conf file, and the aggregated CSVs computed from them ARE committed, one level
+# up, so every table and figure in the paper can still be rebuilt from a clone.
+#
+# The scripts that turn these into the aggregates live outside the ignored trees,
+# in adaptive_behaviour/pong/analysis/aggregate/.
+results/published/dpefe/M2/
+results/published/dpefe/M5/
+results/published/dpefe/M10/
+results/published/dpefe/M20/
+results/published/si/data/
+results/revision/baselines/
