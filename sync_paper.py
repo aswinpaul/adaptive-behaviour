@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Copy the generated tables and figures from outputs/ into the paper repository."""
 
 from __future__ import annotations
 

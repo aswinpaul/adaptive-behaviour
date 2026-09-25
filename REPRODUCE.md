@@ -2,15 +2,16 @@
 
 Every table and figure in the manuscript, mapped to the command that produces it.
 
-Work is grouped by cost. Tiers 0–1 run in minutes from a clone. Tier 4 needs a cluster.
+Work is grouped by cost. Tiers 0–1 run in minutes from a clone, tier 2 in seconds with
+the private recordings. Tier 4 needs a cluster.
 Anything marked **private** cannot be run from a clone at all, because it reads in-vitro
 culture recordings that are not redistributable.
 
 | Tier | What it produces | Cost | From a clone |
 |---|---|---|---|
 | 0 | the manuscript PDF | minutes | yes |
-| 1 | 5 of 13 tables, and `fig_panels.pdf` | minutes | yes |
-| 2 | the 36 figure panels | minutes | 4 of 10 scripts are private |
+| 1 | 5 of 13 tables | minutes | yes |
+| 2 | `fig_panels.pdf`, the three results figures | seconds | **private** |
 | 3 | aggregated CSVs, from raw per-seed output | minutes | raw output not shipped |
 | 4 | all raw per-seed output | ~8,600 CPU-hours | cluster |
 
@@ -32,15 +33,16 @@ compiles without this repository.
 cd paper-adaptive-behaviour && pdflatex paper.tex
 ```
 
-## Tier 1 — regenerate tables and assemble figures
-
-```bash
-python adaptive_behaviour/pong/analysis/build_figures.py   # -> outputs/figures, outputs/github-readme
-python sync_paper.py                                       # copy outputs/ into the submodule
-```
+## Tier 1 — regenerate tables
 
 Tables are written by the modules in `adaptive_behaviour/pong/analysis/tables/`, each
-callable with no arguments. All write into `outputs/tables/`.
+callable with no arguments. All write into `outputs/tables/`. Copy them, with the figures
+from tier 2, into the paper with:
+
+```bash
+python sync_paper.py            # copy outputs/ into the paper repository
+python sync_paper.py --check    # compare only; exit 1 if anything differs
+```
 
 ### Where each table comes from
 
@@ -63,42 +65,52 @@ callable with no arguments. All write into `outputs/tables/`.
 `tab_hyperparams` reads no data at all: it parses the runner sources and fails loudly if
 a hyperparameter in the paper no longer matches the code, so it cannot go stale.
 
-### Where the figures come from
+## Tier 2 — draw the results figures
 
-`build_figures.py` assembles `fig_panels.pdf`, three pages of twelve panels each, from
-PNGs under `results/`. The manuscript references them by page number.
+```bash
+python adaptive_behaviour/pong/analysis/build_figures.py   # -> outputs/figures, outputs/github-readme
+```
+
+**Private:** panels a–f and k–l compare the agents with the cultures, so the build reads
+the in-vitro recordings and cannot run from a clone. The paper repository carries the
+built `fig_panels.pdf`, so tier 0 is unaffected.
+
+`build_figures.py` draws `fig_panels.pdf` directly from the data, as vector graphics,
+in about ten seconds. Three modules split the work:
+
+| Module | Role |
+|---|---|
+| `analysis/figdata.py` | what each panel plots: filters, grouping, z-score cut, entropy normalisation |
+| `analysis/plots/panels.py` | how a panel is drawn: box plots, linear fits with 95% CIs, bars |
+| `analysis/plots/style.py` | sizes, fonts, colours and axis labels shared by every panel |
+
+The manuscript references the pages by number.
 
 | Page | Content | Paper |
 |---|---|---|
-| 1 | `cfl_agents` | `page=1` |
-| 2 | `dpefe_agents` | `page=3` |
-| 3 | `aif_agent` | `page=2` |
+| 1 | `cfl_agents` | `page=1`, `fig:results-cfl` |
+| 2 | `dpefe_agents` | `page=2`, `fig:results-dpefe` |
+| 3 | `aif_agent` | `page=3`, `fig:results-aif` |
 
-Panel L is the same in-vitro baseline on all three pages
-(`results/published/experiment/Rel_Improvement_SBI_exp.png`).
+Each page is 165 mm wide (the preprint's text width) and at most 170 mm tall, with rows
+a–c, d–f, g–j and k–l. Panel l is the same in-vitro baseline on all three pages, and
+panels a–c and k–l share their y-range across the pages so the agent families can be
+compared by eye.
 
-Assembly only reads existing PNGs, so tier 1 works from a clone. Regenerating the PNGs
-themselves is tier 2.
+**The build checks its own output.** Before writing anything it audits every page
+against the target journal's figure rules (Communications AI & Computing) and stops,
+listing the problems, if any text is outside 8–12 pt, any line is thinner than 0.3 pt,
+any text leaves the page or overlaps another, or the page is the wrong size.
 
-## Tier 2 — regenerate the figure panels
+The output is deterministic: every bootstrapped interval passes `seed=0`, and
+`fig_panels.pdf` is written without a creation timestamp, so two builds are
+byte-identical and `python sync_paper.py --check` only reports a real change. Row order
+in `figdata` is part of that contract, since the bootstrap resamples rows by position.
 
-Scripts in `adaptive_behaviour/pong/analysis/plots/`, one per agent family. Four of the
-ten read the in-vitro recordings and cannot run from a clone:
-`plot_cl_performance.py`, `plot_dpefe_performance.py`, `plot_si_performance.py`,
-`plot_experiment.py`.
-
-**Run each in its own process.** They set global seaborn style, so running several in one
-interpreter changes figure sizes.
-
-```bash
-for s in adaptive_behaviour/pong/analysis/plots/*.py; do python "$s"; done
-python adaptive_behaviour/pong/analysis/build_figures.py
-```
-
-The output is deterministic: the confidence bands drawn by seaborn are bootstrapped, so
-all 19 of those calls pass `seed=0`, and `fig_panels.pdf` is written without a creation
-timestamp. Regenerating everything and running `python sync_paper.py --check` reports no
-change, which means a difference always indicates a real one.
+The ten `plot_*.py` scripts in `analysis/plots/` are the earlier per-panel PNG
+pipeline. `build_figures.py` no longer uses them; the redesigned figures were checked
+to plot exactly the same 1,385 statistics (box quartiles, means, whiskers, fit end
+points, slopes, confidence limits and bar heights) as those scripts.
 
 ## Tier 3 — rebuild aggregates from raw per-seed output
 
@@ -163,6 +175,7 @@ From the stored notebook outputs, on a 12-core laptop unless noted.
 | Baselines, all 396 | ~50 min |
 | Noise sweep, all 28 runs | ~13 h |
 | Published runs, per SLURM job | 6 – 10 h (99 tasks × 2 CPUs) |
+| `build_figures.py`, all three pages | ~10 s |
 
 The DPEFE per-seed spread is real, not measurement noise: cost depends on how long
 rallies run, which varies with the seed.

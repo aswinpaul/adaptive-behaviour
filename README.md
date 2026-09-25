@@ -18,11 +18,13 @@ recorded under the same protocol, and against non-active-inference controls
 
 ## Results
 
-Each panel set covers one agent family. Panels **A–C** are the three performance
-measures (long rallies, aces, average rally length), **D–F** their trends over a trial,
-**G–J** the model quantities that move alongside — entropy of the transition and
-state-action mappings, and the risk term — **K** relative improvement, and **L** the
-in-vitro baseline, which is identical across all three for comparison.
+Each figure covers one agent family. Panels **a–c** are the three performance
+measures (long rallies, aces, average rally length) in the first 5 minutes (open boxes)
+and the last 15 (filled), **d–f** their linear trends over a trial with 95% confidence
+intervals at both ends, **g–j** the model quantities that move alongside — entropy of
+the transition and state-action mappings, and the risk term — **k** relative
+improvement, and **l** the in-vitro baseline, which is identical across all three for
+comparison.
 
 ### Counterfactual learning, memory horizons 1–4
 
@@ -57,7 +59,7 @@ adaptive_behaviour/
   pong/
     env/              Pong environment and state/observation mapping
     runners/          one script per agent; generated/ holds notebook-patched variants
-    analysis/         table generators, plotting scripts, figure assembly
+    analysis/         table generators, figure data, panel drawing and page layout
     notebooks/        the six analyses, numbered in reading order
     hpc/              SLURM submission files for the published runs
 results/
@@ -97,7 +99,9 @@ Both write into `outputs/`. Nothing writes into the paper repository directly �
 `sync_paper.py` copies `outputs/` across in one direction.
 
 The remaining tables come from `baseline_tables` and `01_statistics.ipynb`, which read
-the in-vitro recordings and so cannot run from a clone.
+the in-vitro recordings and so cannot run from a clone. The same holds for
+`build_figures.py`, since most panels compare the agents with the cultures; the paper
+repository carries the built figures.
 
 ## Data availability
 
