@@ -1,7 +1,7 @@
 \begin{table}[ht]
 \centering
 \small
-\caption{Predictive information of the learned transition model as a function of rollout depth. Entries are the entropy of the $h$-step-ahead prediction, normalised by the entropy of the uniform distribution over the same support, so that a value of one means the rollout carries no information about the future state.}
+\caption{Predictive information of the learned transition model as a function of rollout depth. Entries are the entropy of the $h$-step-ahead prediction, normalised by the entropy of the uniform distribution over the same support. The value of one means the rollout carries no information about the future state. Here, normalised entropy is computed from the transition parameters of the DP-5 agent on 3 seeds, averaged over the three actions and over all starting states. The environment itself is deterministic; what decays with depth is the information carried by the agent's \textit{estimate} of it.}
 \label{tab:planningdepth}
 \begin{tabular}{rrr}
 \toprule
@@ -17,5 +17,4 @@ Depth $h$ & Normalised entropy & SD \\
 20 & 0.868 & 0.102 \\
 \bottomrule
 \end{tabular}
-\\[4pt]\footnotesize{Computed from the transition parameters of the DP-5 agent on 3 seeds, averaged over the three actions and over all starting states. The environment itself is deterministic; what decays with depth is the information carried by the agent's \textit{estimate} of it.}
 \end{table}

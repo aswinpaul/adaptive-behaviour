@@ -51,18 +51,17 @@ def write_table(root: str | Path = paths.RESULTS_PLANNING_DEPTH,
     body = ["\\begin{table}[ht]", "\\centering", "\\small",
             "\\caption{Predictive information of the learned transition model as a function of "
             "rollout depth. Entries are the entropy of the $h$-step-ahead prediction, normalised "
-            "by the entropy of the uniform distribution over the same support, so that a value of "
-            "one means the rollout carries no information about the future state.}",
+            "by the entropy of the uniform distribution over the same support. The value of one "
+            "means the rollout carries no information about the future state. Here, normalised "
+            "entropy is computed from the transition parameters of the DP-5 agent on "
+            f"{int(s.n_seeds.iloc[0])} seeds, averaged over the three actions and over all "
+            "starting states. The environment itself is deterministic; what decays with depth is "
+            "the information carried by the agent's \\textit{estimate} of it.}",
             "\\label{tab:planningdepth}",
             "\\begin{tabular}{rrr}", "\\toprule",
             "Depth $h$ & Normalised entropy & SD \\\\", "\\midrule"]
     body += [r + " \\\\" for r in rows]
-    body += ["\\bottomrule", "\\end{tabular}",
-             "\\\\[4pt]\\footnotesize{Computed from the transition parameters of the DP-5 agent "
-             f"on {int(s.n_seeds.iloc[0])} seeds, averaged over the three actions and over all "
-             "starting states. The environment itself is deterministic; what decays with depth is "
-             "the information carried by the agent's \\textit{estimate} of it.}",
-             "\\end{table}"]
+    body += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
 
     tab_dir = Path(tab_dir)
     tab_dir.mkdir(parents=True, exist_ok=True)
