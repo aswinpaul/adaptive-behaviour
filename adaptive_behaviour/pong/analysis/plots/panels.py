@@ -34,6 +34,11 @@ TIME_TICKS = (0, 5, 10, 15, 20)
 CI_DODGE_MIN = 0.32  # sideways offset between neighbouring CI bars, in minutes
 CI_BAR_PT = 0.9
 CI_CAP_PT = 1.2
+POINT_SIZE_PT = 1.2     # marker diameter
+POINT_EDGE_PT = 0.3     # the journal's minimum line width
+POINT_EDGE = "#404040"
+POINT_JITTER = 0.12     # half-width of the sideways jitter, in category units
+Z_BOX, Z_POINTS, Z_SUMMARY = 1.0, 1.5, 2.0
 UNIFORM_COLOR = "#404040"
 #: Space above the uniform line for its label, as a fraction of the axis range.
 UNIFORM_HEADROOM = 0.14
@@ -87,10 +92,22 @@ def _category_ticks(ax, categories: list[str]) -> None:
                 ha="center", va="top", clip_on=False)
 
 
+def _points(ax, values: np.ndarray, x: float, rng: np.random.Generator) -> None:
+    """One marker per session or trial, jittered sideways within the box."""
+    jitter = rng.uniform(-POINT_JITTER, POINT_JITTER, size=values.size)
+    ax.plot(x + jitter, values, linestyle="none", marker="o", ms=POINT_SIZE_PT,
+            mfc="white", mec=POINT_EDGE, mew=POINT_EDGE_PT, zorder=Z_POINTS)
+
+
 def draw_boxes(ax, spec: figdata.Boxes, *, ylabel: str, ylim=None, uniform=False) -> None:
-    """Two boxes per category: the first trial window open, the second filled."""
+    """Two boxes per category: the first trial window open, the second filled.
+
+    When spec.points is given, its values are overlaid as jittered points: above the
+    box so they show on filled boxes, below the median and mean so those stay legible.
+    """
     frame = spec.frame
     categories = list(frame[spec.category].unique())
+    rng = np.random.default_rng(0)  # fixed jitter, so builds stay byte-identical
     for i, category in enumerate(categories):
         color = style.color_for(category)
         rows = frame[frame[spec.category] == category]
@@ -99,9 +116,10 @@ def draw_boxes(ax, spec: figdata.Boxes, *, ylabel: str, ylim=None, uniform=False
             if values.size == 0:
                 continue
             filled = style.WINDOW_FILLED[window]
-            ax.bxp(
+            x = i + (j - 0.5) * 2 * BOX_OFFSET
+            artists = ax.bxp(
                 cbook.boxplot_stats(values, whis=1.5),
-                positions=[i + (j - 0.5) * 2 * BOX_OFFSET],
+                positions=[x],
                 widths=BOX_WIDTH,
                 patch_artist=True,
                 showfliers=False,
@@ -113,7 +131,14 @@ def draw_boxes(ax, spec: figdata.Boxes, *, ylabel: str, ylim=None, uniform=False
                 whiskerprops={"color": color, "linewidth": BOX_LINE_PT},
                 capprops={"color": color, "linewidth": BOX_LINE_PT},
                 manage_ticks=False,
+                zorder=Z_BOX,
             )
+            for artist in artists["medians"] + artists["means"]:
+                artist.set_zorder(Z_SUMMARY)
+            if spec.points is not None:
+                pts = spec.points
+                mask = (pts[spec.category] == category) & (pts[spec.window] == window)
+                _points(ax, pts.loc[mask, spec.value].dropna().to_numpy(), x, rng)
     _category_ticks(ax, categories)
     ax.set_xlim(-0.5, len(categories) - 0.5)
     _finish_y(ax, ylabel, ylim)

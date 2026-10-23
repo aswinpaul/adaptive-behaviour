@@ -11,7 +11,7 @@ culture recordings that are not redistributable.
 |---|---|---|---|
 | 0 | the manuscript PDF | minutes | yes |
 | 1 | 5 of 13 tables | minutes | yes |
-| 2 | `fig_panels.pdf`, the three results figures | seconds | **private** |
+| 2 | `fig_panels.pdf` (three results figures) and `fig_gen_model.pdf` | seconds | **private** |
 | 3 | aggregated CSVs, from raw per-seed output | minutes | raw output not shipped |
 | 4 | all raw per-seed output | ~8,600 CPU-hours | cluster |
 
@@ -81,10 +81,15 @@ in about ten seconds. Three modules split the work:
 | Module | Role |
 |---|---|
 | `analysis/figdata.py` | what each panel plots: filters, grouping, z-score cut, entropy normalisation |
-| `analysis/plots/panels.py` | how a panel is drawn: box plots, linear fits with 95% CIs, bars |
+| `analysis/plots/panels.py` | how a panel is drawn: box plots with per-session points, linear fits with 95% CIs, bars |
 | `analysis/plots/style.py` | sizes, fonts, colours and axis labels shared by every panel |
+| `analysis/plots/gen_model.py` | `fig_gen_model.pdf`: the court, the model graph and the parameters by scheme |
 
-The manuscript references the pages by number.
+`fig_gen_model.pdf` reads no data: its sizes, action sets, bin edges and array shapes
+come from the runner scripts, the environment and pymdp, so it cannot drift from the
+model. It is built in the same run and passes the same audit.
+
+The manuscript references the pages of `fig_panels.pdf` by number.
 
 | Page | Content | Paper |
 |---|---|---|

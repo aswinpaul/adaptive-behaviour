@@ -28,9 +28,10 @@ def _pairs() -> list[tuple]:
     """(source, destination, is_text) for everything this repository generates."""
     items = [(t, paths.PAPER_TABLES / t.name, True)
              for t in sorted(paths.OUTPUTS_TABLES.glob("*.tex"))]
-    panels = paths.OUTPUTS_FIGURES / "fig_panels.pdf"
-    if panels.exists():
-        items.append((panels, paths.PAPER_FIGURES / panels.name, False))
+    for name in ("fig_panels.pdf", "fig_gen_model.pdf"):
+        figure = paths.OUTPUTS_FIGURES / name
+        if figure.exists():
+            items.append((figure, paths.PAPER_FIGURES / name, False))
     return items
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the three results figures (fig_panels.pdf) and their README previews.
+"""Build the paper's figures: the three results figures and the generative model.
 
 Each page is one figure at print size, 165 mm wide and at most 170 mm tall, drawn
 directly from figdata in the paper style. Rows, with the panel letters the captions
@@ -11,8 +11,9 @@ use:
     k l       relative improvement of the agents (k) and of the in-vitro groups (l)
 
 Panels a-c and k-l share their y-range across the three pages, so the agent families
-can be compared by eye. Every page is audited against the journal's figure rules
-before anything is written (see audit()).
+can be compared by eye. The same run also draws fig_gen_model.pdf (plots/gen_model.py),
+the generative model every agent shares. Every figure is audited against the
+journal's figure rules before anything is written (see audit()).
 """
 
 from __future__ import annotations
@@ -39,7 +40,7 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
 from adaptive_behaviour.pong.analysis import figdata
-from adaptive_behaviour.pong.analysis.plots import panels, style
+from adaptive_behaviour.pong.analysis.plots import gen_model, panels, style
 
 PAPER_DIR = paths.OUTPUTS_FIGURES
 README_DIR = paths.OUTPUTS_README
@@ -288,6 +289,8 @@ def build(paper_dir: Path = PAPER_DIR, readme_dir: Path = README_DIR) -> None:
             fig, _ = draw_page(page, shared)
             problems += [f"{page.name}: {p}" for p in audit(fig)]
             figures.append((page, fig))
+        model_fig = gen_model.draw_figure()
+        problems += [f"fig_gen_model: {p}" for p in audit(model_fig)]
     if problems:
         raise SystemExit("Figure audit failed:\n  " + "\n  ".join(problems))
 
@@ -300,7 +303,12 @@ def build(paper_dir: Path = PAPER_DIR, readme_dir: Path = README_DIR) -> None:
             fig.savefig(readme_dir / f"{page.name}.png", dpi=300)
             plt.close(fig)
 
-    for path in (pdf_path, *(readme_dir / f"{p.name}.png" for p in PAGES)):
+    model_path = paper_dir / "fig_gen_model.pdf"
+    with style.context():
+        model_fig.savefig(model_path, metadata={"CreationDate": None})
+        plt.close(model_fig)
+
+    for path in (pdf_path, model_path, *(readme_dir / f"{p.name}.png" for p in PAGES)):
         shown = path.relative_to(REPO_ROOT) if path.is_relative_to(REPO_ROOT) else path
         print(f"Wrote {shown}")
 

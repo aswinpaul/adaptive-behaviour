@@ -20,7 +20,7 @@ recorded under the same protocol, and against non-active-inference controls
 
 Each figure covers one agent family. Panels **a–c** are the three performance
 measures (long rallies, aces, average rally length) in the first 5 minutes (open boxes)
-and the last 15 (filled), **d–f** their linear trends over a trial with 95% confidence
+and the last 15 (filled), with one point per session or trial, **d–f** their linear trends over a trial with 95% confidence
 intervals at both ends, **g–j** the model quantities that move alongside — entropy of
 the transition and state-action mappings, and the risk term — **k** relative
 improvement, and **l** the in-vitro baseline, which is identical across all three for

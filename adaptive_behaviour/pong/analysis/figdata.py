@@ -83,11 +83,16 @@ FAMILIES = {
 
 @dataclass(frozen=True)
 class Boxes:
-    """Distribution per category and trial window (box plot)."""
+    """Distribution per category and trial window (box plot).
+
+    points holds one value per session (in vitro) or trial (in silico) and window,
+    overlaid on the boxes; it has the same category, window and value columns.
+    """
     frame: pd.DataFrame
     value: str
     category: str = "group_name"
     window: str = "window"
+    points: pd.DataFrame | None = None
 
 
 @dataclass(frozen=True)
@@ -282,13 +287,32 @@ def modality_entropy(family_key: str, parameter: str) -> pd.DataFrame:
 
 # --- pages ----------------------------------------------------------------------------
 
+#: What identifies one session (in vitro) or one simulated trial (in silico).
+_SESSION_KEYS = ["group", "tag", "chip_id", "date", "session_num"]
+_TRIAL_KEYS = ["group", "session_num"]
+
+
+def _per_session(frame: pd.DataFrame, value: str, keys: list[str]) -> pd.DataFrame:
+    """Mean of value per session or trial and window, for the points on a box plot."""
+    return (frame.groupby(keys + ["group_name", "window"], sort=False)[value]
+            .mean().reset_index())
+
+
+def _boxes(frame: pd.DataFrame, value: str, keys: list[str] | None) -> Boxes:
+    """A box plot whose points are its own rows (keys None) or their per-session means."""
+    points = frame if keys is None else _per_session(frame, value, keys)
+    return Boxes(frame, value, points=points)
+
+
 def page_data(family_key: str) -> dict[str, Boxes | Trends | Bars]:
     """What each panel a-l of one figure page plots."""
     perf = performance(family_key)
     panels: dict[str, Boxes | Trends | Bars] = {
-        "a": Boxes(perf["sessions"], "%long_rally"),
-        "b": Boxes(perf["sessions"], "%ace"),
-        "c": Boxes(perf["minutes"], "hit_count"),
+        # a-b: each row is already one session in one window.
+        "a": _boxes(perf["sessions"], "%long_rally", None),
+        "b": _boxes(perf["sessions"], "%ace", None),
+        # c: rows are minutes; the points are each session's mean.
+        "c": _boxes(perf["minutes"], "hit_count", _SESSION_KEYS),
         "d": Trends(perf["trends"], "%long_rally"),
         "e": Trends(perf["trends"], "%ace"),
         "f": Trends(perf["trends"], "hit_count"),
@@ -298,16 +322,17 @@ def page_data(family_key: str) -> dict[str, Boxes | Trends | Bars]:
     if family_key == "cfl":
         nte, risk = cl_nte(), cl_risk()
         panels |= {
-            "g": Boxes(nte, "entropy_1"),
-            "h": Boxes(risk, "gamma"),
+            # g-h: rows are episodes; the points are each trial's mean.
+            "g": _boxes(nte, "entropy_1", _TRIAL_KEYS),
+            "h": _boxes(risk, "gamma", _TRIAL_KEYS),
             "i": Trends(_minute_means(nte), "entropy_1"),
             "j": Trends(_minute_means(risk), "gamma"),
         }
     else:
         b, c = modality_entropy(family_key, "b"), modality_entropy(family_key, "c")
         panels |= {
-            "g": Boxes(b, "entropy"),
-            "h": Boxes(c, "entropy"),
+            "g": _boxes(b, "entropy", _TRIAL_KEYS),
+            "h": _boxes(c, "entropy", _TRIAL_KEYS),
             "i": Trends(_minute_means(b), "entropy"),
             "j": Trends(_minute_means(c), "entropy"),
         }
